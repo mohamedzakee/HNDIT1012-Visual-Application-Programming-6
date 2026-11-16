@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 6 Arrays Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: Visual Studio-flavoured workbench. Left rail nav on wide screens, top tabs on phones; each view is a stack of panels. */
+:root{
+  --bg:#f3f4f8; --panel:#ffffff; --ink:#1d2333; --muted:#5b6478; --line:#dcdfe8;
+  --accent:#4b3fbf; --accent-soft:#ebe8fb; --code-bg:#1f2130; --code-ink:#e6e6f0;
+  --good:#1f8a4c; --good-soft:#e2f4e9; --bad:#c23a3a; --bad-soft:#fbe6e6; --warn:#a86b00; --warn-soft:#fdf1d8;
+  --win:#f0f0f0; --win-title:#cfdcf0;
+  --font-display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#14151d; --panel:#1d1f2a; --ink:#e7e8f0; --muted:#a2a7b8; --line:#30333f;
+    --accent:#9d92ff; --accent-soft:#2a2750; --code-bg:#0f1017; --code-ink:#e6e6f0;
+    --good:#4fcf86; --good-soft:#173324; --bad:#ff7b7b; --bad-soft:#3a1d1f; --warn:#f0b54a; --warn-soft:#3a2d12;
+    --win:#262833; --win-title:#2f3a52; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14151d; --panel:#1d1f2a; --ink:#e7e8f0; --muted:#a2a7b8; --line:#30333f;
+  --accent:#9d92ff; --accent-soft:#2a2750; --code-bg:#0f1017; --code-ink:#e6e6f0;
+  --good:#4fcf86; --good-soft:#173324; --bad:#ff7b7b; --bad-soft:#3a1d1f; --warn:#f0b54a; --warn-soft:#3a2d12;
+  --win:#262833; --win-title:#2f3a52; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--font-body)}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:22px} h2{font-size:24px} h3{font-size:17px}
+p{margin:0}
+code,.mono{font-family:var(--font-mono);font-size:.92em}
+p code,li code,td code{background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.shell{display:grid;grid-template-columns:220px 1fr;min-height:100%}
+.rail{background:var(--panel);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;gap:18px;position:sticky;top:0;height:100vh}
+.brand small{display:block;color:var(--muted);font-size:12px;letter-spacing:.04em;text-transform:uppercase}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav a{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:7px;color:var(--ink);text-decoration:none;font-weight:500}
+.nav a span.n{font-family:var(--font-mono);font-size:12px;color:var(--muted);width:18px}
+.nav a:hover{background:var(--accent-soft)}
+.nav a[aria-current="page"]{background:var(--accent);color:#fff}
+.nav a[aria-current="page"] span.n{color:#fff}
+.score{margin-top:auto;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--muted)}
+.score b{color:var(--ink);font-variant-numeric:tabular-nums}
+main{padding:28px clamp(16px,4vw,40px) 60px;max-width:1080px;width:100%}
+.view{display:none;flex-direction:column;gap:18px}
+.view.on{display:flex}
+.lead{color:var(--muted);max-width:68ch}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.btn{border:1px solid var(--line);background:var(--panel);padding:7px 14px;border-radius:7px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+input[type=text],input[type=number],select{border:1px solid var(--line);background:var(--bg);padding:7px 10px;border-radius:7px;min-width:0}
+input[type=number]{width:72px}
+label{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+
+pre.code{margin:0;background:var(--code-bg);color:var(--code-ink);border-radius:8px;padding:12px 0;font:13.5px/1.6 var(--font-mono);overflow-x:auto}
+pre.code .ln{display:block;padding:0 16px;white-space:pre;border-left:3px solid transparent}
+pre.code .ln.cur{background:rgba(157,146,255,.18);border-left-color:#9d92ff}
+.k{color:#c792ea}.t{color:#4fc1d6}.s{color:#f2a97a}.nm{color:#b5e48c}.c{color:#7d8197;font-style:italic}.m{color:#ffd479}
+
+/* array boxes */
+.arr{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end}
+.cell{display:flex;flex-direction:column;align-items:center;gap:4px}
+.box{min-width:74px;padding:10px 8px;border:2px solid var(--line);border-radius:8px;background:var(--bg);text-align:center;font-family:var(--font-mono);font-weight:600;transition:transform .25s,background .25s,border-color .25s}
+.idx{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.box.hi{border-color:var(--accent);background:var(--accent-soft)}
+.box.sec{border-color:var(--warn);background:var(--warn-soft)}
+.box.ok{border-color:var(--good);background:var(--good-soft)}
+.box.click{cursor:pointer}
+.box.click:hover{border-color:var(--accent)}
+@media (prefers-reduced-motion:reduce){.box{transition:none}}
+
+.msg{padding:10px 14px;border-radius:8px;border:1px solid var(--line);background:var(--bg)}
+.msg.good{background:var(--good-soft);border-color:var(--good);color:var(--ink)}
+.msg.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--ink)}
+.msg.warn{background:var(--warn-soft);border-color:var(--warn)}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--accent-soft);color:var(--accent)}
+
+/* lessons */
+.lesson-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.lesson-tabs button{border:1px solid var(--line);background:var(--panel);border-radius:99px;padding:5px 12px;cursor:pointer;font-size:13px}
+.lesson-tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.lesson-tabs button.seen::after{content:" ✓";}
+.lesson ul{margin:0;padding-left:20px}
+.lesson li{margin:3px 0}
+
+/* winforms mock */
+.win{border:1px solid #8aa0c4;border-radius:6px;overflow:hidden;background:var(--win);max-width:440px}
+.win .title{background:var(--win-title);padding:5px 10px;font-size:13px;display:flex;justify-content:space-between}
+.win .title i{font-style:normal;letter-spacing:6px;color:var(--muted)}
+.win .body{padding:18px;display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+.listbox{width:150px;height:170px;background:var(--panel);border:1px solid #7a7a7a;font-size:13px;overflow:auto;padding:2px}
+.listbox div{padding:1px 4px}
+.listbox div.new{background:#3478d6;color:#fff}
+.combo{width:170px;font-size:13px}
+.combo .head{border:1px solid #7a7a7a;background:var(--panel);padding:3px 6px;display:flex;justify-content:space-between}
+.combo .drop{border:1px solid #7a7a7a;border-top:0;background:var(--panel);min-height:22px}
+.combo .drop div{padding:1px 6px}
+.winbtn{border:1px solid #adadad;background:#e1e1e1;color:#111;padding:5px 12px;font-size:13px;border-radius:3px;align-self:center}
+.vars{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-family:var(--font-mono);font-size:13px}
+.vars dt{color:var(--muted)} .vars dd{margin:0}
+
+table{border-collapse:collapse;width:100%}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.tablewrap{overflow-x:auto}
+
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{text-align:left;border:1px solid var(--line);background:var(--bg);padding:10px 14px;border-radius:8px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.right{background:var(--good-soft);border-color:var(--good)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.bar{height:6px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.log{font-family:var(--font-mono);font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;max-height:160px;overflow:auto;white-space:pre}
+
+@media (max-width:820px){
+  .shell{grid-template-columns:1fr}
+  .rail{position:sticky;top:0;z-index:5;height:auto;flex-direction:row;align-items:center;padding:10px 12px;gap:10px;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}
+  .brand small,.score{display:none}
+  .nav{flex-direction:row}
+  .nav a{white-space:nowrap;padding:6px 10px}
+  .nav a span.n{display:none}
+  .grid2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="rail">
+    <div class="brand"><small>HNDIT1012 · Week 6</small><h1>Arrays in C#</h1></div>
+    <nav class="nav" aria-label="Sections">
+      <a href="#learn"><span class="n">01</span>Learn</a>
+      <a href="#lab"><span class="n">02</span>ListBox lab</a>
+      <a href="#playground"><span class="n">03</span>Playground</a>
+      <a href="#trace"><span class="n">04</span>Trace it</a>
+      <a href="#quiz"><span class="n">05</span>Quiz</a>
+      <a href="#cheat"><span class="n">06</span>Cheat sheet</a>
+    </nav>
+    <div class="score" id="scorebox">Lessons <b id="sLessons">0/6</b><br>Traces solved <b id="sTrace">0</b><br>Best quiz <b id="sQuiz">–</b></div>
+  </aside>
+
+  <main>
+  <!-- LEARN -->
+  <section class="view" id="v-learn">
+    <h2>Learn: arrays step by step</h2>
+    <p class="lead">Six short lessons that follow the Week 6 slides. Each one has a live example: click and type to see how the array responds.</p>
+    <div class="lesson-tabs" role="tablist" id="lessonTabs"></div>
+    <div class="panel lesson" id="lessonBody"></div>
+    <div class="row"><button class="btn" id="prevL">Previous</button><button class="btn primary" id="nextL">Next lesson</button></div>
+  </section>
+
+  <!-- LAB -->
+  <section class="view" id="v-lab">
+    <h2>ListBox lab: watch the code run</h2>
+    <p class="lead">Pick one of the three button-click handlers from the slides, then step through it one line at a time. The form shows what the user sees; the variables panel shows what the program knows.</p>
+    <div class="row" role="radiogroup" aria-label="Example">
+      <button class="btn" data-mode="for">for loop (slide 7)</button>
+      <button class="btn" data-mode="foreach">foreach (slide 8)</button>
+      <button class="btn" data-mode="range">Sort + Reverse + AddRange (slide 11)</button>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>button1_Click</h3>
+        <pre class="code" id="labCode"></pre>
+        <div class="row"><button class="btn primary" id="labStep">Step</button><button class="btn" id="labRun">Run to end</button><button class="btn" id="labReset">Reset</button><span class="pill" id="labCount"></span></div>
+      </div>
+      <div class="panel">
+        <div class="win" aria-label="Form preview">
+          <div class="title"><span>W6</span><i>_□×</i></div>
+          <div class="body" id="labForm"></div>
+        </div>
+        <h3>Variables</h3>
+        <div id="labArr" class="arr"></div>
+        <dl class="vars" id="labVars"></dl>
+        <div class="msg" id="labNote"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAYGROUND -->
+  <section class="view" id="v-playground">
+    <h2>Array playground</h2>
+    <p class="lead">Build your own array and run the Week 6 operations on it. Every action writes the matching C# statement to the log, so you can copy it into Visual Studio.</p>
+    <div class="panel">
+      <div class="row">
+        <label for="pgType">Type<select id="pgType"><option value="string">string</option><option value="int">int</option></select></label>
+        <label for="pgVals" style="flex:1;min-width:220px">Values (comma-separated)<input type="text" id="pgVals" value="Volvo, BMW, Toyota, Mazda, Suzuki"></label>
+        <button class="btn primary" id="pgCreate" style="align-self:flex-end">Create array</button>
+      </div>
+      <div class="arr" id="pgArr"></div>
+      <p class="mono" id="pgLen"></p>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>Read an element</h3>
+        <div class="row"><label for="pgIdx">Index<input type="number" id="pgIdx" value="0"></label><button class="btn" id="pgGet" style="align-self:flex-end">arr[index]</button></div>
+        <div class="msg" id="pgGetOut">Click a box above or enter an index.</div>
+      </div>
+      <div class="panel">
+        <h3>Sort and reverse</h3>
+        <div class="row"><button class="btn" id="pgSort">Array.Sort(arr)</button><button class="btn" id="pgRev">Array.Reverse(arr)</button></div>
+        <div class="row">
+          <label for="pgRi">index<input type="number" id="pgRi" value="0" min="0"></label>
+          <label for="pgRl">length<input type="number" id="pgRl" value="2" min="0"></label>
+          <button class="btn" id="pgRevPart" style="align-self:flex-end">Array.Reverse(arr, index, length)</button>
+        </div>
+        <div class="msg" id="pgOpOut">The highlighted boxes show the section a partial reverse will touch.</div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="row" style="justify-content:space-between"><h3>Code log</h3><button class="btn" id="pgCopy">Copy code</button></div>
+      <div class="log" id="pgLog"></div>
+    </div>
+  </section>
+
+  <!-- TRACE -->
+  <section class="view" id="v-trace">
+    <h2>Trace it: predict the final array</h2>
+    <p class="lead">Read the code, work out what the array holds at the end, and type the elements in order, separated by commas. Quotes are optional.</p>
+    <div class="panel">
+      <div class="row" style="justify-content:space-between"><span class="pill" id="trNum"></span><div class="row"><button class="btn" id="trPrev">Previous</button><button class="btn" id="trNext">Next</button><button class="btn" id="trRand">Random challenge</button></div></div>
+      <pre class="code" id="trCode"></pre>
+      <div class="row"><input type="text" id="trAns" style="flex:1;min-width:220px" placeholder="e.g. 2, 4, 5, 7, 9" aria-label="Your answer"><button class="btn primary" id="trCheck">Check</button><button class="btn" id="trShow">Show steps</button></div>
+      <div class="msg" id="trOut">Type your answer, then press Check.</div>
+      <div id="trSteps"></div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="view" id="v-quiz">
+    <h2>Quiz</h2>
+    <p class="lead">Fourteen questions covering every Week 6 slide. You get an explanation after each answer.</p>
+    <div class="panel" id="quizBox"></div>
+  </section>
+
+  <!-- CHEAT -->
+  <section class="view" id="v-cheat">
+    <h2>Cheat sheet</h2>
+    <div class="panel tablewrap"><table id="cheatTbl"><thead><tr><th>Task</th><th>Code</th></tr></thead><tbody></tbody></table></div>
+    <div class="panel">
+      <h3>Common mistakes</h3>
+      <div class="tablewrap"><table id="mistTbl"><thead><tr><th>Wrong</th><th>Right</th><th>Why</th></tr></thead><tbody></tbody></table></div>
+    </div>
+  </section>
+  </main>
+</div>
+
+<script>
+(function(){
+"use strict";
+var store = {
+  get:function(k,d){try{var v=localStorage.getItem("w6arr_"+k);return v===null?d:JSON.parse(v);}catch(e){return d;}},
+  set:function(k,v){try{localStorage.setItem("w6arr_"+k,JSON.stringify(v));}catch(e){}}
+};
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+/* ---------- C# highlighter ---------- */
+var KW="private|void|object|string|int|double|for|foreach|in|new|if|return|public|true|false|null";
+var TY="Array|EventArgs|MessageBox|Console";
+var RX=new RegExp('("(?:[^"\\\\]|\\\\.)*")|(\\/\\/.*$)|\\b(\\d+)\\b|\\b('+KW+')\\b|\\b('+TY+')\\b|\\b(Sort|Reverse|Add|AddRange|Clear|Show|Length)\\b','g');
+function hl(line){
+  var out="",last=0,m;RX.lastIndex=0;
+  while((m=RX.exec(line))){
+    out+=esc(line.slice(last,m.index));
+    var cls=m[1]?"s":m[2]?"c":m[3]?"nm":m[4]?"k":m[5]?"t":"m";
+    out+='<span class="'+cls+'">'+esc(m[0])+"</span>";last=RX.lastIndex;
+  }
+  return out+esc(line.slice(last));
+}
+function codeHTML(lines,cur){
+  return lines.map(function(l,i){return '<span class="ln'+(i===cur?" cur":"")+'">'+(hl(l)||" ")+"</span>";}).join("");
+}
+function fmt(v,type){return type==="string"?'"'+v+'"':String(v);}
+function cmp(type){return type==="int"?function(a,b){return a-b;}:function(a,b){return a.localeCompare(b,"en");};}
+function reverseRange(a,i,l){var s=a.slice(i,i+l).reverse();for(var k=0;k<l;k++)a[i+k]=s[k];}
+function boxes(arr,type,opts){
+  opts=opts||{};
+  return arr.map(function(v,i){
+    var c="box";
+    if(opts.hi&&opts.hi.indexOf(i)>-1)c+=" hi";
+    if(opts.sec&&opts.sec.indexOf(i)>-1)c+=" sec";
+    if(opts.click)c+=" click";
+    return '<div class="cell"><div class="'+c+'" data-i="'+i+'"'+(opts.click?' role="button" tabindex="0" aria-label="element '+i+'"':"")+'>'+esc(fmt(v,type))+'</div><span class="idx">['+i+']</span></div>';
+  }).join("");
+}
+
+/* ---------- Progress ---------- */
+var seen=store.get("seen",[]), solved=store.get("solved",[]), best=store.get("best",null);
+function refreshScore(){
+  $("sLessons").textContent=seen.length+"/6";
+  $("sTrace").textContent=solved.length;
+  $("sQuiz").textContent=best===null?"–":best+"/"+QUIZ.length;
+}
+
+/* ---------- LEARN ---------- */
+var CARS=["Volvo","BMW","Ford","Mazda"];
+var LESSONS=[
+ {t:"What is an array?",html:function(){return '<h3>One variable, many values</h3><p>An array stores many values of the <b>same type</b> in a single variable, instead of declaring a separate variable for each value. Declare it with the type followed by square brackets:</p><pre class="code">'+codeHTML(["string[] cars;   // array of strings","int[] marks;     // array of integers"])+'</pre><ul><li>All elements share one data type.</li><li>The size is fixed once the array is created.</li><li>Elements sit in numbered slots called <b>indexes</b>, starting at 0.</li></ul><div class="msg warn">Compare: four separate variables <code>car1</code>…<code>car4</code> cannot be processed by a loop. One array <code>cars</code> can.</div>';}},
+ {t:"Array literals",html:function(){return '<h3>Declare and fill in one statement</h3><p>Place the values in a comma-separated list inside curly braces. C# counts them and sizes the array.</p><pre class="code">'+codeHTML(['string[] cars = {"Volvo", "BMW", "Ford", "Mazda"};',"int[] myNum = {10, 20, 30, 40};"])+'</pre><p>Try it: type values and see the array C# would build.</p><div class="row"><input type="text" id="litIn" value="10, 20, 30, 40" style="flex:1" aria-label="Values"></div><pre class="code" id="litCode"></pre><div class="arr" id="litArr"></div>';},init:function(){
+   function up(){var raw=$("litIn").value.split(",").map(function(s){return s.trim();}).filter(Boolean);var isInt=raw.length&&raw.every(function(s){return /^-?\d+$/.test(s);});var vals=isInt?raw.map(Number):raw.map(function(s){return s.replace(/^"|"$/g,"");});var ty=isInt?"int":"string";$("litCode").innerHTML=codeHTML([ty+"[] values = {"+vals.map(function(v){return fmt(v,ty);}).join(", ")+"};","// values.Length is "+vals.length]);$("litArr").innerHTML=boxes(vals,ty);}
+   $("litIn").addEventListener("input",up);up();}},
+ {t:"Indexes",html:function(){return '<h3>Access an element by its index</h3><p>Write the array name and the index in square brackets. The first element is index 0.</p><pre class="code">'+codeHTML(["string mycar = cars[0];   // \"Volvo\""])+'</pre><p>Click a box, or type an index (try 4 or -1).</p><div class="arr" id="ixArr">'+boxes(CARS,"string",{click:true})+'</div><div class="row"><label for="ixIn">Index<input type="number" id="ixIn" value="0"></label></div><pre class="code" id="ixCode"></pre><div class="msg" id="ixOut"></div>';},init:function(){
+   function show(i){$("ixIn").value=i;$("ixCode").innerHTML=codeHTML(["string mycar = cars["+i+"];"]);document.querySelectorAll("#ixArr .box").forEach(function(b){b.classList.toggle("hi",+b.dataset.i===i);});
+     if(i>=0&&i<CARS.length){$("ixOut").className="msg good";$("ixOut").textContent='mycar is "'+CARS[i]+'". Index '+i+" is element number "+(i+1)+".";}
+     else{$("ixOut").className="msg bad";$("ixOut").textContent="IndexOutOfRangeException: Index was outside the bounds of the array. Valid indexes are 0 to "+(CARS.length-1)+".";}}
+   $("ixArr").addEventListener("click",function(e){var b=e.target.closest(".box");if(b)show(+b.dataset.i);});
+   $("ixArr").addEventListener("keydown",function(e){var b=e.target.closest(".box");if(b&&(e.key==="Enter"||e.key===" ")){e.preventDefault();show(+b.dataset.i);}});
+   $("ixIn").addEventListener("input",function(){var v=parseInt(this.value,10);if(!isNaN(v))show(v);});show(0);}},
+ {t:"Length",html:function(){return '<h3>How many elements?</h3><p><code>Length</code> is a property (no brackets) that returns the number of elements.</p><pre class="code">'+codeHTML(["int x = cars.Length;   // 4"])+'</pre><div class="arr" id="lnArr"></div><div class="row"><button class="btn" id="lnAdd">Add an element to the literal</button><button class="btn" id="lnDel">Remove one</button></div><dl class="vars" id="lnVars"></dl><div class="msg warn">Last index is always <code>Length - 1</code>. That is why loops use <code>i &lt; cars.Length</code>, never <code>i &lt;= cars.Length</code>.</div>';},init:function(){
+   var pool=["Volvo","BMW","Ford","Mazda","Toyota","Suzuki","Honda","Kia"],n=4;
+   function up(){var a=pool.slice(0,n);$("lnArr").innerHTML=boxes(a,"string",{hi:[a.length-1]});$("lnVars").innerHTML="<dt>cars.Length</dt><dd>"+a.length+"</dd><dt>first index</dt><dd>0</dd><dt>last index</dt><dd>cars.Length - 1 = "+(a.length-1)+"</dd><dt>last element</dt><dd>\""+a[a.length-1]+"\"</dd>";}
+   $("lnAdd").onclick=function(){if(n<pool.length){n++;up();}};$("lnDel").onclick=function(){if(n>1){n--;up();}};up();}},
+ {t:"Loops",html:function(){return '<h3>for and foreach</h3><p>Both loops below add every car to <code>listBox1</code>. <code>Items.Add(item)</code> adds one item to the ListBox\'s Items collection.</p><div class="grid2"><pre class="code">'+codeHTML(["for (int i = 0; i < cars.Length; i++)","    listBox1.Items.Add(cars[i]);"])+'</pre><pre class="code">'+codeHTML(["foreach (string car in cars)","    listBox1.Items.Add(car);"])+'</pre></div><div class="tablewrap"><table><thead><tr><th>Use for</th><th>Use foreach</th></tr></thead><tbody><tr><td>You need the index</td><td>You just read each element</td></tr><tr><td>You change elements</td><td>Order 0 to Length-1 is fine</td></tr><tr><td>You skip or go backwards</td><td>You want no index mistakes</td></tr></tbody></table></div><p>See both run line by line in the <a href="#lab">ListBox lab</a>.</p>';}},
+ {t:"Sort & Reverse",html:function(){return '<h3>Array.Sort and Array.Reverse</h3><p><code>Array.Sort(arr)</code> sorts strings A to Z and numbers smallest first. <code>Array.Reverse(arr)</code> reverses all elements; <code>Array.Reverse(arr, index, length)</code> reverses only <code>length</code> elements starting at <code>index</code>.</p><pre class="code" id="srCode"></pre><div class="arr" id="srArr"></div><div class="row"><button class="btn" id="srBack">Back</button><button class="btn primary" id="srFwd">Run next line</button></div><div class="msg" id="srNote"></div>';},init:function(){
+   var lines=['string[] cars = { "Volvo", "BMW", "Toyota", "Mazda", "Suzuki" };',"Array.Sort(cars);","Array.Reverse(cars, 0, 2);","comboBox1.Items.AddRange(cars);"];
+   var states=[["Volvo","BMW","Toyota","Mazda","Suzuki"],["BMW","Mazda","Suzuki","Toyota","Volvo"],["Mazda","BMW","Suzuki","Toyota","Volvo"],["Mazda","BMW","Suzuki","Toyota","Volvo"]];
+   var notes=["The array is created with 5 cars in the order written.","Sorted alphabetically: BMW, Mazda, Suzuki, Toyota, Volvo.","Only the section starting at index 0 with length 2 is reversed: BMW and Mazda swap. The rest is untouched.","AddRange adds the whole array to the ComboBox in one call. The dropdown shows Mazda, BMW, Suzuki, Toyota, Volvo."];
+   var s=0;function up(){$("srCode").innerHTML=codeHTML(lines,s);$("srArr").innerHTML=boxes(states[s],"string",{sec:s===2?[0,1]:[]});$("srNote").textContent=notes[s];$("srBack").disabled=s===0;$("srFwd").disabled=s===3;}
+   $("srFwd").onclick=function(){if(s<3){s++;up();}};$("srBack").onclick=function(){if(s>0){s--;up();}};up();}}
+];
+var li=0;
+function renderLesson(){
+  $("lessonTabs").innerHTML=LESSONS.map(function(l,i){return '<button role="tab" aria-selected="'+(i===li)+'" class="'+(seen.indexOf(i)>-1?"seen":"")+'" data-i="'+i+'">'+(i+1)+". "+l.t+"</button>";}).join("");
+  $("lessonBody").innerHTML=LESSONS[li].html();
+  if(LESSONS[li].init)LESSONS[li].init();
+  if(seen.indexOf(li)<0){seen.push(li);store.set("seen",seen);refreshScore();}
+  $("prevL").disabled=li===0;$("nextL").textContent=li===LESSONS.length-1?"Go to the lab":"Next lesson";
+}
+$("lessonTabs").addEventListener("click",function(e){var b=e.target.closest("button");if(b){li=+b.dataset.i;renderLesson();}});
+$("prevL").onclick=function(){if(li>0){li--;renderLesson();}};
+$("nextL").onclick=function(){if(li<LESSONS.length-1){li++;renderLesson();}else location.hash="lab";};
+
+/* ---------- LAB ---------- */
+var LAB={
+ for:{lines:["private void button1_Click(object sender, EventArgs e)","{",'    string[] cars = { "Volvo", "BMW", "Ford", "Mazda" };',"    for (int i = 0; i < cars.Length; i++)","        listBox1.Items.Add(cars[i]);","}"],ctl:"list"},
+ foreach:{lines:["private void button1_Click(object sender, EventArgs e)","{",'    string[] cars = { "Volvo", "BMW", "Ford", "Mazda" };',"    foreach (string car in cars)","        listBox1.Items.Add(car);","}"],ctl:"list"},
+ range:{lines:["private void button1_Click(object sender, EventArgs e)","{",'    string[] cars = { "Volvo", "BMW", "Toyota", "Mazda", "Suzuki" };',"    Array.Sort(cars);","    Array.Reverse(cars, 0, 2);","    comboBox1.Items.AddRange(cars);","}"],ctl:"combo"}
+};
+function buildSteps(mode){
+  var S=[],items=[];
+  function push(o){o.items=items.slice();S.push(o);}
+  push({line:0,arr:null,vars:{},note:"The user clicks the button, so Windows calls the button1_Click event handler."});
+  if(mode==="range"){
+    var a=["Volvo","BMW","Toyota","Mazda","Suzuki"];
+    push({line:2,arr:a.slice(),vars:{"cars.Length":5},note:"An array of 5 strings is created from the literal."});
+    a.sort(cmp("string"));push({line:3,arr:a.slice(),vars:{"cars.Length":5},hi:[0,1,2,3,4],note:"Array.Sort puts the names in alphabetical order."});
+    reverseRange(a,0,2);push({line:4,arr:a.slice(),vars:{index:0,length:2},sec:[0,1],note:"Array.Reverse(cars, 0, 2) reverses 2 elements starting at index 0: BMW and Mazda swap places."});
+    items=a.slice();push({line:5,arr:a.slice(),vars:{},newAll:true,note:"Items.AddRange adds all 5 elements to the ComboBox in one call. No loop needed."});
+    push({line:6,arr:a.slice(),vars:{},note:"The handler ends. Open the ComboBox to see: Mazda, BMW, Suzuki, Toyota, Volvo."});
+    return S;
+  }
+  var c=CARS.slice();
+  push({line:2,arr:c,vars:{"cars.Length":4},note:"An array of 4 strings is created. Indexes run from 0 to 3."});
+  for(var i=0;i<4;i++){
+    if(mode==="for"){
+      push({line:3,arr:c,vars:{i:i,"i < cars.Length":i+" < 4 → true"},hi:[i],note:(i===0?"i starts at 0. ":"i++ makes i = "+i+". ")+"The condition is true, so the body runs."});
+      items.push(c[i]);push({line:4,arr:c,vars:{i:i,"cars[i]":'"'+c[i]+'"'},hi:[i],newLast:true,note:'listBox1.Items.Add(cars['+i+']) adds "'+c[i]+'" to the ListBox.'});
+    }else{
+      push({line:3,arr:c,vars:{car:'"'+c[i]+'"'},hi:[i],note:'foreach takes the next element (index '+i+'): car = "'+c[i]+'".'});
+      items.push(c[i]);push({line:4,arr:c,vars:{car:'"'+c[i]+'"'},hi:[i],newLast:true,note:'listBox1.Items.Add(car) adds "'+c[i]+'".'});
+    }
+  }
+  if(mode==="for")push({line:3,arr:c,vars:{i:4,"i < cars.Length":"4 < 4 → false"},note:"i is now 4. The condition is false, so the loop stops. cars[4] is never touched."});
+  else push({line:3,arr:c,vars:{},note:"There are no more elements, so foreach ends."});
+  push({line:5,arr:c,vars:{},note:"The handler ends. The ListBox shows all 4 cars."});
+  return S;
+}
+var labMode="for",labSteps=[],labPos=0;
+function labRender(){
+  var st=labSteps[labPos],cfg=LAB[labMode];
+  $("labCode").innerHTML=codeHTML(cfg.lines,st.line);
+  $("labCount").textContent="Step "+(labPos+1)+" of "+labSteps.length;
+  var form;
+  if(cfg.ctl==="list"){
+    form='<div><div class="idx">listBox1</div><div class="listbox">'+st.items.map(function(t,k){return '<div class="'+(st.newLast&&k===st.items.length-1?"new":"")+'">'+esc(t)+"</div>";}).join("")+'</div></div><button class="winbtn" tabindex="-1">Add Cars to List</button>';
+  }else{
+    form='<div class="combo"><div class="idx">comboBox1</div><div class="head"><span>'+(st.items[0]?"":"&nbsp;")+'</span><span>▾</span></div><div class="drop">'+st.items.map(function(t){return "<div>"+esc(t)+"</div>";}).join("")+'</div></div><button class="winbtn" tabindex="-1">Load Cars</button>';
+  }
+  $("labForm").innerHTML=form;
+  $("labArr").innerHTML=st.arr?boxes(st.arr,"string",{hi:st.hi,sec:st.sec}):'<span class="idx">cars not created yet</span>';
+  var v=Object.keys(st.vars);$("labVars").innerHTML=v.map(function(k){return "<dt>"+esc(k)+"</dt><dd>"+esc(st.vars[k])+"</dd>";}).join("");
+  $("labNote").textContent=st.note;
+  $("labStep").disabled=$("labRun").disabled=labPos===labSteps.length-1;
+  document.querySelectorAll("[data-mode]").forEach(function(b){b.classList.toggle("primary",b.dataset.mode===labMode);b.setAttribute("aria-pressed",b.dataset.mode===labMode);});
+}
+function labSet(m){labMode=m;labSteps=buildSteps(m);labPos=0;labRender();}
+document.querySelectorAll("[data-mode]").forEach(function(b){b.onclick=function(){labSet(b.dataset.mode);};});
+$("labStep").onclick=function(){if(labPos<labSteps.length-1){labPos++;labRender();}};
+$("labRun").onclick=function(){labPos=labSteps.length-1;labRender();};
+$("labReset").onclick=function(){labPos=0;labRender();};
+
+/* ---------- PLAYGROUND ---------- */
+var pg={type:"string",arr:[],log:[]};
+function pgParse(){
+  var ty=$("pgType").value,raw=$("pgVals").value.split(",").map(function(s){return s.trim().replace(/^"|"$/g,"");}).filter(function(s){return s.length;});
+  if(!raw.length)return {err:"Enter at least one value."};
+  if(ty==="int"){for(var i=0;i<raw.length;i++)if(!/^-?\d+$/.test(raw[i]))return {err:'"'+raw[i]+'" is not a whole number. An int array can only hold integers.'};return {ty:ty,arr:raw.map(Number)};}
+  return {ty:ty,arr:raw};
+}
+function pgSection(){var i=parseInt($("pgRi").value,10),l=parseInt($("pgRl").value,10);var s=[];if(!isNaN(i)&&!isNaN(l))for(var k=i;k<i+l;k++)if(k>=0&&k<pg.arr.length)s.push(k);return s;}
+function pgRender(hi){
+  $("pgArr").innerHTML=boxes(pg.arr,pg.type,{click:true,hi:hi||[],sec:pgSection()});
+  $("pgLen").textContent="arr.Length = "+pg.arr.length+"   ·   valid indexes 0 to "+(pg.arr.length-1);
+  $("pgLog").textContent=pg.log.join("\n");$("pgLog").scrollTop=1e6;
+}
+function pgCreate(){
+  var r=pgParse();if(r.err){$("pgOpOut").className="msg bad";$("pgOpOut").textContent=r.err;return;}
+  pg.type=r.ty;pg.arr=r.arr;
+  pg.log=[pg.type+"[] arr = {"+pg.arr.map(function(v){return fmt(v,pg.type);}).join(", ")+"};"];
+  $("pgOpOut").className="msg";$("pgOpOut").textContent="Array created with "+pg.arr.length+" elements.";
+  pgRender();
+}
+function pgGet(i){
+  $("pgIdx").value=i;pg.log.push(pg.type+" x = arr["+i+"];");
+  if(i>=0&&i<pg.arr.length){$("pgGetOut").className="msg good";$("pgGetOut").textContent="arr["+i+"] is "+fmt(pg.arr[i],pg.type)+".";pgRender([i]);}
+  else{$("pgGetOut").className="msg bad";$("pgGetOut").textContent="IndexOutOfRangeException: index "+i+" is outside 0 to "+(pg.arr.length-1)+".";pg.log[pg.log.length-1]+="   // crashes!";pgRender();}
+}
+$("pgCreate").onclick=pgCreate;
+$("pgType").onchange=function(){$("pgVals").value=this.value==="int"?"5, 1, 8, 9, 3":"Volvo, BMW, Toyota, Mazda, Suzuki";pgCreate();};
+$("pgGet").onclick=function(){var i=parseInt($("pgIdx").value,10);if(!isNaN(i))pgGet(i);};
+$("pgArr").addEventListener("click",function(e){var b=e.target.closest(".box");if(b)pgGet(+b.dataset.i);});
+$("pgArr").addEventListener("keydown",function(e){var b=e.target.closest(".box");if(b&&(e.key==="Enter"||e.key===" ")){e.preventDefault();pgGet(+b.dataset.i);}});
+$("pgSort").onclick=function(){pg.arr.sort(cmp(pg.type));pg.log.push("Array.Sort(arr);");$("pgOpOut").className="msg good";$("pgOpOut").textContent="Sorted "+(pg.type==="int"?"smallest to largest.":"alphabetically.");pgRender();};
+$("pgRev").onclick=function(){pg.arr.reverse();pg.log.push("Array.Reverse(arr);");$("pgOpOut").className="msg good";$("pgOpOut").textContent="All "+pg.arr.length+" elements reversed.";pgRender();};
+$("pgRevPart").onclick=function(){
+  var i=parseInt($("pgRi").value,10),l=parseInt($("pgRl").value,10),o=$("pgOpOut");
+  if(isNaN(i)||isNaN(l)){o.className="msg bad";o.textContent="Enter both index and length.";return;}
+  if(i<0||l<0){o.className="msg bad";o.textContent="ArgumentOutOfRangeException: index and length cannot be negative.";pg.log.push("Array.Reverse(arr, "+i+", "+l+");   // crashes!");pgRender();return;}
+  if(i+l>pg.arr.length){o.className="msg bad";o.textContent="ArgumentException: index + length ("+(i+l)+") is more than arr.Length ("+pg.arr.length+").";pg.log.push("Array.Reverse(arr, "+i+", "+l+");   // crashes!");pgRender();return;}
+  reverseRange(pg.arr,i,l);pg.log.push("Array.Reverse(arr, "+i+", "+l+");");
+  o.className="msg good";o.textContent=l<2?"A section of "+l+" element changes nothing.":"Reversed indexes "+i+" to "+(i+l-1)+" ("+l+" elements). Everything else stayed put.";pgRender();
+};
+["pgRi","pgRl"].forEach(function(id){$(id).addEventListener("input",function(){pgRender();});});
+$("pgCopy").onclick=function(){var b=this;try{navigator.clipboard.writeText(pg.log.join("\n")).then(function(){b.textContent="Copied";setTimeout(function(){b.textContent="Copy code";},1500);},function(){b.textContent="Copy blocked: select the log text";});}catch(e){b.textContent="Copy blocked: select the log text";}};
+
+/* ---------- TRACE ---------- */
+var TRACES=[
+ {ty:"int",init:[4,7,2,9,5],ops:[["sort"]]},
+ {ty:"int",init:[4,7,2,9,5],ops:[["sort"],["rev",1,3]]},
+ {ty:"string",init:["Kandy","Galle","Ampara","Colombo"],ops:[["sort"],["rev"]],name:"towns"},
+ {ty:"string",init:["Volvo","BMW","Toyota","Mazda","Suzuki"],ops:[["sort"],["rev",0,2]],name:"cars"},
+ {ty:"int",init:[10,20,30,40,50],ops:[["rev",2,3]]},
+ {ty:"string",init:["Ford","Audi","Kia","BMW"],ops:[["rev"],["sort"]],name:"cars"},
+ {ty:"int",init:[12,3,45,7,30,1],ops:[["sort"],["rev"],["rev",0,3]]},
+ {ty:"string",init:["Java","Networking","Database","Web","Maths"],ops:[["sort"],["rev",1,3]],name:"subjects"}
+];
+function traceRun(t){
+  var a=t.init.slice(),steps=[{line:0,arr:a.slice()}],nm=t.name||(t.ty==="int"?"n":"s");
+  t.ops.forEach(function(o,k){
+    if(o[0]==="sort")a.sort(cmp(t.ty));else if(o.length===1)a.reverse();else reverseRange(a,o[1],o[2]);
+    steps.push({line:k+1,arr:a.slice(),sec:o.length===3?range(o[1],o[2]):null});
+  });
+  var lines=[t.ty+"[] "+nm+" = {"+t.init.map(function(v){return fmt(v,t.ty);}).join(", ")+"};"].concat(t.ops.map(function(o){return o[0]==="sort"?"Array.Sort("+nm+");":o.length===1?"Array.Reverse("+nm+");":"Array.Reverse("+nm+", "+o[1]+", "+o[2]+");";}));
+  return {lines:lines,steps:steps,ans:a};
+}
+function range(i,l){var r=[];for(var k=i;k<i+l;k++)r.push(k);return r;}
+function randTrace(){
+  var n=5+Math.floor(Math.random()*2),init=[];while(init.length<n){var v=1+Math.floor(Math.random()*60);if(init.indexOf(v)<0)init.push(v);}
+  var ops=[["sort"]];var i=Math.floor(Math.random()*(n-2)),l=2+Math.floor(Math.random()*(n-i-1));
+  if(Math.random()<.4)ops.push(["rev"]);ops.push(["rev",i,l]);
+  return {ty:"int",init:init,ops:ops,rand:true};
+}
+var ti=0,cur=null,curT=null;
+function trRender(t){
+  curT=t||TRACES[ti];cur=traceRun(curT);
+  $("trNum").textContent=curT.rand?"Random challenge":"Challenge "+(ti+1)+" of "+TRACES.length+(solved.indexOf(ti)>-1?" · solved":"");
+  $("trCode").innerHTML=codeHTML(cur.lines);$("trAns").value="";$("trOut").className="msg";$("trOut").textContent="Type your answer, then press Check.";$("trSteps").innerHTML="";
+  $("trPrev").disabled=!curT.rand&&ti===0;$("trNext").disabled=!curT.rand&&ti===TRACES.length-1;
+}
+function norm(s){return s.trim().replace(/^["']|["']$/g,"").toLowerCase();}
+$("trCheck").onclick=function(){
+  var got=$("trAns").value.split(",").map(norm).filter(Boolean),want=cur.ans.map(function(v){return String(v).toLowerCase();});
+  var ok=got.length===want.length&&got.every(function(g,k){return g===want[k];});
+  if(ok){$("trOut").className="msg good";$("trOut").textContent="Correct! Final array: "+cur.ans.map(function(v){return fmt(v,curT.ty);}).join(", ");if(!curT.rand&&solved.indexOf(ti)<0){solved.push(ti);store.set("solved",solved);refreshScore();}$("trNum").textContent=curT.rand?"Random challenge · solved":"Challenge "+(ti+1)+" of "+TRACES.length+" · solved";}
+  else{var hint=got.length!==want.length?"You gave "+got.length+" values; the array has "+want.length+".":"First difference at index "+got.findIndex(function(g,k){return g!==want[k];})+".";$("trOut").className="msg bad";$("trOut").textContent="Not yet. "+hint+" Try again or press Show steps.";}
+};
+$("trAns").addEventListener("keydown",function(e){if(e.key==="Enter")$("trCheck").click();});
+$("trShow").onclick=function(){
+  $("trSteps").innerHTML=cur.steps.map(function(s){return '<div class="panel" style="padding:12px 14px;gap:8px"><pre class="code">'+codeHTML([cur.lines[s.line]])+'</pre><div class="arr">'+boxes(s.arr,curT.ty,{sec:s.sec||[]})+"</div></div>";}).join("");
+};
+$("trPrev").onclick=function(){if(curT.rand){trRender();return;}if(ti>0){ti--;trRender();}};
+$("trNext").onclick=function(){if(curT.rand){trRender();return;}if(ti<TRACES.length-1){ti++;trRender();}};
+$("trRand").onclick=function(){trRender(randTrace());};
+
+/* ---------- QUIZ ---------- */
+var QUIZ=[
+ {q:"What is the index of the first element of a C# array?",o:["0","1","-1","It depends on the array type"],a:0,e:"C# arrays are zero-based: the first element is at index 0."},
+ {q:'string[] cars = {"Volvo", "BMW", "Ford", "Mazda"};  What is cars.Length?',o:["4","3","5","0"],a:0,e:"Length is the number of elements, which is 4. The last index is 3."},
+ {q:"Which line correctly declares an integer array?",o:["int[] marks;","int marks[];","array int marks;","int() marks;"],a:0,e:"In C#, the square brackets go after the type: int[] marks;"},
+ {q:"Which array literal is valid?",o:["int[] n = {10, 20, 30};","int[] n = (10, 20, 30);","int[] n = [10; 20; 30];","int[] n = {10, \"20\", 30};"],a:0,e:"Literals use curly braces and commas, and every value must match the declared type."},
+ {q:'Given the cars array above, what does cars[2] return?',o:['"Ford"','"BMW"','"Mazda"','An exception'],a:0,e:"Index 2 is the third element: Volvo [0], BMW [1], Ford [2]."},
+ {q:"Which loop condition visits every element exactly once?",o:["for (int i = 0; i < cars.Length; i++)","for (int i = 0; i <= cars.Length; i++)","for (int i = 1; i <= cars.Length; i++)","for (int i = 1; i < cars.Length; i++)"],a:0,e:"Start at 0 and stop before Length. The <= version reaches cars[4], which does not exist."},
+ {q:"What happens when code reads cars[4] on a 4-element array?",o:["IndexOutOfRangeException at run time","It returns null","It returns the last element","A compile error"],a:0,e:"The code compiles, but at run time C# throws IndexOutOfRangeException because valid indexes are 0 to 3."},
+ {q:"Which call adds every element of an array to a ComboBox at once?",o:["comboBox1.Items.AddRange(cars);","comboBox1.Items.Add(cars);","comboBox1.AddAll(cars);","comboBox1.Items = cars;"],a:0,e:"AddRange adds a whole array. Add(cars) would add one item showing System.String[]."},
+ {q:"int[] n = {5, 1, 8, 9};  Array.Sort(n);  What does n hold?",o:["1, 5, 8, 9","9, 8, 5, 1","5, 1, 8, 9","1, 8, 5, 9"],a:0,e:"Array.Sort orders numbers in ascending order."},
+ {q:'After Array.Sort(cars), cars is {"BMW","Mazda","Suzuki","Toyota","Volvo"}. What does Array.Reverse(cars, 0, 2) produce?',o:["Mazda, BMW, Suzuki, Toyota, Volvo","Volvo, Toyota, Suzuki, Mazda, BMW","BMW, Mazda, Toyota, Suzuki, Volvo","Mazda, BMW, Toyota, Suzuki, Volvo"],a:0,e:"Only 2 elements starting at index 0 are reversed, so BMW and Mazda swap."},
+ {q:"In Array.Reverse(arr, index, length), what does the third argument mean?",o:["How many elements to reverse","The last index to reverse","The index to start from","How many times to reverse"],a:0,e:"The second argument is the start index; the third is the number of elements in the section."},
+ {q:"In what order does foreach process a one-dimensional array?",o:["Increasing index, from 0 to Length - 1","Decreasing index","Alphabetical order","Random order"],a:0,e:"foreach starts at index 0 and ends at index Length - 1."},
+ {q:"Why is cars.Length() an error?",o:["Length is a property, not a method","Length only works on int arrays","It should be cars.Count()","Arrays have no size"],a:0,e:"Properties are used without brackets: cars.Length."},
+ {q:"How do you sort an array in descending order using this week's methods?",o:["Array.Sort(arr); then Array.Reverse(arr);","Array.Reverse(arr); then Array.Sort(arr);","Array.SortDescending(arr);","Array.Sort(arr, -1);"],a:0,e:"Sort ascending first, then reverse the whole array."}
+];
+var qOrder,qi,qScore,qAnswered;
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function quizStart(){qOrder=shuffle(QUIZ.map(function(q,i){return {q:q,opts:shuffle(q.o.map(function(t,k){return {t:t,k:k};}))};}));qi=0;qScore=0;quizRender();}
+function quizRender(){
+  var box=$("quizBox");
+  if(qi>=qOrder.length){
+    if(best===null||qScore>best){best=qScore;store.set("best",best);refreshScore();}
+    var pct=Math.round(qScore/QUIZ.length*100);
+    box.innerHTML='<h3>Score: '+qScore+" / "+QUIZ.length+" ("+pct+'%)</h3><div class="bar"><i style="width:'+pct+'%"></i></div><div class="msg '+(pct>=80?"good":pct>=50?"warn":"bad")+'">'+(pct>=80?"Excellent. You are ready for the Week 6 assessment.":pct>=50?"Good start. Review the lessons for the questions you missed, then try again.":"Work through the Learn section and the lab, then retake the quiz.")+'</div><div class="row"><button class="btn primary" id="qAgain">Retake quiz</button></div>';
+    $("qAgain").onclick=quizStart;return;
+  }
+  var it=qOrder[qi];qAnswered=false;
+  box.innerHTML='<div class="row" style="justify-content:space-between"><span class="pill">Question '+(qi+1)+" of "+QUIZ.length+'</span><span class="mono">Score '+qScore+'</span></div><div class="bar"><i style="width:'+(qi/QUIZ.length*100)+'%"></i></div><h3>'+esc(it.q.q)+'</h3><div class="opts">'+it.opts.map(function(o,k){return '<button class="opt" data-k="'+o.k+'"><code>'+esc(o.t)+"</code></button>";}).join("")+'</div><div id="qFb"></div>';
+  box.querySelectorAll(".opt").forEach(function(b){b.onclick=function(){
+    if(qAnswered)return;qAnswered=true;var right=+b.dataset.k===it.q.a;if(right)qScore++;
+    box.querySelectorAll(".opt").forEach(function(x){x.disabled=true;if(+x.dataset.k===it.q.a)x.classList.add("right");});
+    if(!right)b.classList.add("wrong");
+    $("qFb").innerHTML='<div class="msg '+(right?"good":"bad")+'"><b>'+(right?"Correct.":"Not quite.")+"</b> "+esc(it.q.e)+'</div><div class="row" style="margin-top:10px"><button class="btn primary" id="qNext">'+(qi===QUIZ.length-1?"See score":"Next question")+"</button></div>";
+    $("qNext").onclick=function(){qi++;quizRender();};$("qNext").focus();
+  };});
+}
+
+/* ---------- CHEAT ---------- */
+var CHEAT=[["Declare","string[] cars;"],["Create empty, fixed size","int[] marks = new int[5];"],["Declare and fill","string[] cars = {\"Volvo\", \"BMW\", \"Ford\", \"Mazda\"};"],["Read an element","string mycar = cars[0];"],["Change an element","cars[0] = \"Opel\";"],["Number of elements","cars.Length"],["Last element","cars[cars.Length - 1]"],["Loop with index","for (int i = 0; i < cars.Length; i++)"],["Loop without index","foreach (string car in cars)"],["Sort A–Z / ascending","Array.Sort(cars);"],["Reverse all","Array.Reverse(cars);"],["Reverse a section","Array.Reverse(cars, startIndex, count);"],["Add one item to a ListBox","listBox1.Items.Add(item);"],["Add a whole array","comboBox1.Items.AddRange(cars);"],["Clear a ListBox","listBox1.Items.Clear();"]];
+var MIST=[["i <= cars.Length","i < cars.Length","<= reaches an index that does not exist"],["cars[1] for the first item","cars[0]","indexes start at 0"],["cars.Length()","cars.Length","Length is a property"],["cars.Sort();","Array.Sort(cars);","Sort belongs to the Array class"],["(\"Volvo\", \"BMW\")","{\"Volvo\", \"BMW\"}","literals use curly braces"],["listBox1.Items.Add(cars);","listBox1.Items.AddRange(cars);","Add puts in one item: System.String[]"]];
+document.querySelector("#cheatTbl tbody").innerHTML=CHEAT.map(function(r){return "<tr><td>"+esc(r[0])+"</td><td><code>"+esc(r[1])+"</code></td></tr>";}).join("");
+document.querySelector("#mistTbl tbody").innerHTML=MIST.map(function(r){return "<tr><td><code>"+esc(r[0])+"</code></td><td><code>"+esc(r[1])+"</code></td><td>"+esc(r[2])+"</td></tr>";}).join("");
+
+/* ---------- ROUTER ---------- */
+var VIEWS=["learn","lab","playground","trace","quiz","cheat"];
+function route(){
+  var h=location.hash.replace("#","");if(VIEWS.indexOf(h)<0)h="learn";
+  VIEWS.forEach(function(v){$("v-"+v).classList.toggle("on",v===h);});
+  document.querySelectorAll(".nav a").forEach(function(a){if(a.getAttribute("href")==="#"+h)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current");});
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange",route);
+
+renderLesson();labSet("for");pgCreate();trRender();quizStart();refreshScore();route();
+})();
+</script>
+</body>
+</html>
